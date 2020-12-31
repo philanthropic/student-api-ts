@@ -11,7 +11,7 @@ app.use(bodyParser.text());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.enable("strict routing");
+app.enable("strict routing");   
 app.enable("case sensitive routing");
 
 const serverSetup = async () => {

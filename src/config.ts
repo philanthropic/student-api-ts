@@ -1,9 +1,9 @@
 var config = {
-    host: "172.23.0.4",
-    db_name: "schooldb",
+    host: "localhost",
+    db_name: "studentdb",
     db_user: "postgres",
     db_password: "postgres",
-    port: 5432,
+    port: 5433,
 };
 
 export { config };
