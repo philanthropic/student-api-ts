@@ -13,10 +13,15 @@ router.get("/teachers/view/:teacherId(\\d+)", (req, res) => {
     new TeacherController().teacherDetails(req, res);
 });
 
+
+
 // Routes related to Student
 router.get("/students/view/:studentId(\\d+)", (req, res) => {
     new StudentController().studentDetails(req, res);
 });
+router.post("/students/", (req, res)=> {
+    new StudentController().addNewStudent(req, res);
+})
 
 // Routes related to Subject
 router.get("/subjects/view/:subjectId(\\d+)", (req, res) => {

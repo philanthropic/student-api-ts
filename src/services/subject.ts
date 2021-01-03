@@ -26,6 +26,20 @@ export class SubjectServices{
     
         
         return subject;
+        
+    }
+
+    async getSubjectIdByName(subjectName: string){
+        var subject = await this.model.findOne({
+            where: { name: subjectName},
+            defaults: { id: 0 }
+        });
+        
+        if (subject === null){
+            return 0; 
+        }
+
+        return subject.id;
     }
 }
 
