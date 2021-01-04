@@ -56,6 +56,7 @@ export class SubjectServices {
             subjectPayload.teacher_id
         );
 
+
         if (!teacher) {
             return new Error("invalid teacher id");
         }

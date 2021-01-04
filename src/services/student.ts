@@ -96,11 +96,14 @@ export class StudentServices{
                         subject_id: subjectId,                    
                     }, 
                     type: this.context.QueryTypes.INSERT
-                });
-                return result;
-        }
-    }
+            });
 
+            if (result instanceof Error) {
+                return result;
+            }
+        }        //end of subject loop
+    }
+    
     /**
      * Update student details.
      *
@@ -108,7 +111,7 @@ export class StudentServices{
      * @param {any} studentObject
      */
     async updateStudent(studentId: number, studentObject: any) {
-        const result = this.model
+        const result = await this.model
             .update(studentObject, {
                 where: { id: studentId },
             })

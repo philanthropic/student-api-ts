@@ -15,7 +15,7 @@ export class SubjectController{
         if (!subjectId){
             return res
                 .status(400)
-                .json({message: "Subect Id not provided"});
+                .json({message: "Subject Id not provided"});
         }
 
         // Create new subject service
@@ -27,6 +27,7 @@ export class SubjectController{
     } 
 
     async addNewSubject(req: any, res: any) {
+      
         if (!req.body.name) {
             res.status(400).json({ message: "name cannot be empty" });
         }

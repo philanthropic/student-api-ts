@@ -10,6 +10,7 @@ var sequelize = new Sequelize(
         host: config.host,
         port: config.port,
         dialect: "postgres",
+        omitNull: true,
         // logging : debug, //server.ServerConfig.LogLevel,
         pool: {
             max: 15,
