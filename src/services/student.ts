@@ -274,23 +274,3 @@ export class StudentServices {
     }
 }
 
-/* 
-{
-"Full Name" : "Bijay Shrestha",
-	"Registration" : "",
-	"Grade" : "",
-	"Subjects" : [
-		{ 
-			"Subject" : "Math",
-			"Teacher" : "Ram Thakur"
-		},
-		{ 
-			"Subject" : "Science",
-			"Teacher" : "Hari KC"
-		},
-		{ 
-			"Subject" : "English",
-			"Teacher" : "Sita Sth"
-		}
-	]
-} */
