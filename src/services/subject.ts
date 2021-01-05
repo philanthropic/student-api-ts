@@ -19,7 +19,8 @@ export class SubjectServices {
         var teacherObj = await TeacherServiceInstance.getTeacherById(subject.teacher_id);
 
         subject = subject.get({ plain: true });
-        subject.teacher = teacherObj.get({ plain: true });
+        teacherObj = teacherObj.get({ plain: true });
+        subject.teacher = teacherObj.first_name + " " +teacherObj.last_name
 
         // delte "teacher_id" item from subject
         // as there is new "teacher" object with teacher name and last name.

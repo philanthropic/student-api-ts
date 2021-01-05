@@ -37,6 +37,11 @@ router.get("/students/", (req: any, res: any) => {
     new StudentController().studentList(req, res);
 });
 
+//
+router.get("/students/:pageId(\\d+)", (req: any, res: any) => {
+    new StudentController().studentList(req, res);
+});
+
 router.post("/students/", (req, res)=> {
     new StudentController().addNewStudent(req, res);
 })

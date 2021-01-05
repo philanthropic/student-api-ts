@@ -37,7 +37,7 @@ export class StudentController {
      * @param {any} res
      */
     async addNewStudent(req: any, res: any) {
-        if (!req.body.first_name) {
+        if (!req.body.first_name ) {
             return res
                 .status(400)
                 .json({ message: "Student first name cannot be empty" });
@@ -91,31 +91,9 @@ export class StudentController {
         const studentId: number = req.params.studentId;
         const StudentService = await this.getStudentService();
 
-        // Payload sent by user should have following keys.
-        const validPayloadKeys = [
-            "first_name",
-            "last_name",
-            "teacher_id",
-            "grade",
-            "registration",
-            "subjects",
-        ];
-
-        let updatedStudentObj = {};
-
-        for (const [payloadKey, payloadValue] of Object.entries(req.body)) {
-            // if the payload does not contain valid keys then skip updating that key
-            // value
-            if (!validPayloadKeys.includes(payloadKey)) {
-                continue;
-            }
-            // Dynamically adding item to object.
-            // https://reactgo.com/javascript-variable-object-key/
-            updatedStudentObj[payloadKey] = payloadValue;
-        }
         const isError = await StudentService.updateStudent(
             studentId,
-            updatedStudentObj
+            req.body
         );
 
         if (isError instanceof Error) {
@@ -160,6 +138,7 @@ export class StudentController {
         const currentPage: number = req.params.pageId || 1;
         const searchString: string = req.query.search;
 
+    
         // Create a new StudentService
         const StudentService = await this.getStudentService();
 

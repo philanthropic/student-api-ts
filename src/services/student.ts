@@ -28,22 +28,31 @@ export class StudentServices {
 
         const SubjectService = new SubjectServices(this.context);
 
-        let subjects: {
-            id: number;
-            name: string;
-            grade: number;
-            teacher: any;
+        let subjectsData: {
+            Subject: string;
+            Teacher: string;
         }[] = [];
 
         for (let subObj of subject_ids) {
             let subject = await SubjectService.getSubjectById(
                 subObj.subject_id
             );
-            subjects.push(subject);
+            subjectsData.push(
+                {
+                    Subject: subject.name, 
+                    Teacher: subject.teacher
+                }
+            );
         }
 
         student = student.get({ plain: true });
-        student.subjects = subjects;
+        student.FullName = student.first_name + " " + student.last_name
+        
+        delete student.first_name;
+        delete student.last_name;
+        delete student.id;
+
+        student.subjects = subjectsData;
 
         return student;
     }
@@ -212,7 +221,6 @@ export class StudentServices {
         const itemsPerPage: number = 2;
         const offset: number = (currentPageNumber - 1) * itemsPerPage;
         let result: any;
-        console.log(searchString);
         if (searchString) {
             result = await this.context.query(
                 `SELECT * FROM students
@@ -265,3 +273,24 @@ export class StudentServices {
         return rowDelete;
     }
 }
+
+/* 
+{
+"Full Name" : "Bijay Shrestha",
+	"Registration" : "",
+	"Grade" : "",
+	"Subjects" : [
+		{ 
+			"Subject" : "Math",
+			"Teacher" : "Ram Thakur"
+		},
+		{ 
+			"Subject" : "Science",
+			"Teacher" : "Hari KC"
+		},
+		{ 
+			"Subject" : "English",
+			"Teacher" : "Sita Sth"
+		}
+	]
+} */
