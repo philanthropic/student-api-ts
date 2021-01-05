@@ -41,6 +41,7 @@ router.post("/students/", (req, res)=> {
     new StudentController().addNewStudent(req, res);
 })
 
+
 router.patch("/students/edit/:studentId(\\d+)", (req: any, res: any) => {
     new StudentController().updateStudent(req, res);
 });
@@ -57,6 +58,14 @@ router.get("/subjects/view/:subjectId(\\d+)", (req, res) => {
 
 router.post("/subjects/", (req: any, res: any) => {
     new SubjectController().addNewSubject(req, res);
+});
+
+router.patch("/subjects/edit/:subjectId(\\d+)", (req: any, res: any) => {
+    new SubjectController().updateSubject(req, res);
+});
+
+router.delete("/subjects/delete/:subjectId(\\d+)", (req: any, res: any) => {
+    new SubjectController().deleteSubject(req, res);
 });
 
 module.exports = router;

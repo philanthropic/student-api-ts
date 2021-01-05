@@ -98,6 +98,7 @@ export class StudentController {
             "teacher_id",
             "grade",
             "registration",
+            "subjects",
         ];
 
         let updatedStudentObj = {};
@@ -112,7 +113,6 @@ export class StudentController {
             // https://reactgo.com/javascript-variable-object-key/
             updatedStudentObj[payloadKey] = payloadValue;
         }
-
         const isError = await StudentService.updateStudent(
             studentId,
             updatedStudentObj

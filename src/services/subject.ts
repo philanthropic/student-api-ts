@@ -56,12 +56,61 @@ export class SubjectServices {
             subjectPayload.teacher_id
         );
 
-
         if (!teacher) {
             return new Error("invalid teacher id");
         }
 
         const result = this.model.create(subjectPayload);
         return result;
+    }
+
+     /**
+     * Displays subject details.
+     *
+     * @param {any} req ExpressJS req object
+     * @param {any} res ExpressJS res object
+     */
+    async subjectDetails(req: any, res: any) {
+        const subjectId: number = req.params.subjectId;
+
+        if (!subjectId) {
+            return res
+                .status(400)
+                .json({ message: "Subject Id not provided." });
+        }
+        
+        const subjectObject = await this.getSubjectById(subjectId);
+
+        if (subjectObject instanceof Error) {
+            res.status(500).json({ message: subjectObject.message });
+        }
+
+        return res.status(200).json(subjectObject);
+    }
+
+    async updateSubject(subjectId: number, payload: any) {
+        // https://sequelize.org/v4/manual/tutorial/querying.html
+        const updatedSubject = await this.model.update(
+            {
+                name: payload.name,
+                teacher_id: payload.teacher_id,
+                grade: payload.grade,
+            },
+            { where: { id: subjectId } }
+        );
+        return updatedSubject;
+    }
+
+     /**
+      * Delete subject from db.
+      *
+      * @param {number} subjectId
+      */
+     async deleteSubject(subjectId: number) {
+        const rowDelete = this.model.destroy({ where: { id: subjectId } });
+        if (rowDelete === 1) {
+            return true;
+        }
+        return rowDelete;
     }
 }

@@ -52,4 +52,49 @@ export class SubjectController{
 
         res.status(200).json({ message: "Subject data inserted!" });
     }
+
+    /**
+     * Update subject controller.
+     *
+     * @param {any} req
+     * @param {any} res
+     */
+    async updateSubject(req: any, res: any) {
+        const subjectId: number = req.params.subjectId;
+
+        if (!subjectId) {
+            return res
+                .status(400)
+                .json({ message: "subject Id not provided." });
+        }
+
+        // Create a new SubjectService
+        const SubjectService = await this.getSubjectService();
+        // the payload sent by the user will be in the "req.body"
+        const isError = await SubjectService.updateSubject(subjectId, req.body);
+
+        if (isError instanceof Error) {
+            return res.status(500).json({ message: isError.message });
+        }
+
+        res.status(201).json({ message: "Subject data updated/inserted!" });
+    }
+
+    async deleteSubject(req: any, res: any) {
+        const subjectId = req.params.subjectId;
+        if (!subjectId) {
+            return res.status(400).json({ message: "subjectId not provided." });
+        }
+
+        // Create a new SubjectService
+        const SubjectService = await this.getSubjectService();
+        const isError = await SubjectService.deleteSubject(subjectId);
+        if (isError instanceof Error) {
+            return res.status(500).json({ message: isError.message });
+        }
+
+        return res
+            .status(200)
+            .json({ message: "subject successfully deleted." });
+    }
 }

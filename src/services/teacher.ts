@@ -33,6 +33,27 @@ export class TeacherServices {
       * @param {number} teacherId
       * @param {any} payload
       */
+     async teacherDetails(req: any, res: any) {
+        // teacherId is in the request url. eg. http://localhost:800/teachers/view/1
+        // here 1 at the end of the url is "teacherId" which is defined in routes.
+        const teacherId: number = req.params.teacherId;
+
+        if (!teacherId) {
+            return res
+                .status(400)
+                .json({ message: "Teacher Id not provided." });
+        }
+
+
+        const teacherObject = await this.getTeacherById(teacherId);
+
+        if (teacherObject instanceof Error) {
+            res.status(500).json({ message: teacherObject.message });
+        }
+
+        return res.status(200).json(teacherObject);
+    }
+
      async updateTeacher(teacherId: number, payload: any) {
          // https://sequelize.org/v4/manual/tutorial/querying.html
          const updatedTeacher = await this.model.update(
