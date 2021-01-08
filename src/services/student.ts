@@ -102,7 +102,7 @@ export class StudentServices {
      * @param {any} studentObject
      */
     async updateStudent(studentId: number, studentObject: any) {
-        const result = this.model
+        let result = this.model
             .update(studentObject, {
                 where: { id: studentId },
             })
@@ -115,6 +115,11 @@ export class StudentServices {
 
         // new instance subject service
         const SubjectService = new SubjectServices(this.context);
+        
+        result = await this.deleteStudentMeta(studentId);
+        if (result instanceof Error) {
+            return result;
+        }
 
         // Now check if valid subjects are passed in studentObject
         // looping through subject array
@@ -129,11 +134,6 @@ export class StudentServices {
             // if passed subject is not in subjects table skip it
             if (subjectId === 0) {
                 continue;
-            }
-
-            let result = await this.deleteStudentMeta(studentId);
-            if (result instanceof Error) {
-                return result;
             }
 
             result = await this.addSubjectMeta(studentId, subjectId);
@@ -218,8 +218,7 @@ export class StudentServices {
                 WHERE first_name LIKE :searchString
                 OR last_name LIKE :searchString
                 OR registration LIKE :searchString
-                OR grade LIKE :searchString
-                ORDER BY  timestamp DESC LIMIT :itemsPerPage OFFSET :offset
+                ORDER BY id DESC LIMIT :itemsPerPage OFFSET :offset
                 `,
                 {
                     replacements: {
