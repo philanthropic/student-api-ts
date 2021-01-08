@@ -16,43 +16,33 @@ export class StudentServices {
      * @param {number} studentId
      */
     async getStudentById(studentId: number) {
-        var student = await this.model.findOne({
-            where: { id: studentId },
-        });
+        // Procedure "student_details_by_id" call will return,
+        // an array of object i.e. [ {id: 8, fullname: 'John Doe', grade: 10, registration: 'X1C'} ]
+        var student = await this.context.query(
+            "SELECT * FROM student_details_by_id(?)",
+            {
+                replacements: [studentId],
+                type: this.context.QueryTypes.SELECT,
+            }
+        );
+        student = student[0] || {};
 
-        // fetch all subject_ids associated with student_id from student_meta
-        var subject_ids = await this.context.query(
-            "SELECT subject_id FROM student_meta WHERE student_id = ?",
-            { replacements: [studentId], type: this.context.QueryTypes.SELECT }
+        // Procedure call subjects_by_student_id which 
+        //  returns array of objects
+        // [ 
+        //    { subject: 'Maths', teacher: 'Rabindra Rai' },
+        //    { subject: 'Science', teacher: 'Rabindra Rai' }
+        // ]
+        var subjects = await this.context.query(
+            "SELECT * FROM subjects_by_student_id(?)",
+            {
+                replacements: [studentId],
+                type: this.context.QueryTypes.SELECT,
+            }
         );
 
-        const SubjectService = new SubjectServices(this.context);
-
-        let subjectsData: {
-            Subject: string;
-            Teacher: string;
-        }[] = [];
-
-        for (let subObj of subject_ids) {
-            let subject = await SubjectService.getSubjectById(
-                subObj.subject_id
-            );
-            subjectsData.push(
-                {
-                    Subject: subject.name, 
-                    Teacher: subject.teacher
-                }
-            );
-        }
-
-        student = student.get({ plain: true });
-        student.FullName = student.first_name + " " + student.last_name
-        
-        delete student.first_name;
-        delete student.last_name;
-        delete student.id;
-
-        student.subjects = subjectsData;
+        // adding new entity "subjects" which is array of object into student object.
+        student.subjects = subjects;
 
         return student;
     }
@@ -112,7 +102,7 @@ export class StudentServices {
      * @param {any} studentObject
      */
     async updateStudent(studentId: number, studentObject: any) {
-        let result = this.model
+        const result = this.model
             .update(studentObject, {
                 where: { id: studentId },
             })
@@ -125,11 +115,7 @@ export class StudentServices {
 
         // new instance subject service
         const SubjectService = new SubjectServices(this.context);
-        
-        result = await this.deleteStudentMeta(studentId);
-        if (result instanceof Error) {
-            return result;
-        }
+
         // Now check if valid subjects are passed in studentObject
         // looping through subject array
         for (let subject of studentObject.subjects) {
@@ -145,7 +131,12 @@ export class StudentServices {
                 continue;
             }
 
-            let result = await this.addSubjectMeta(studentId, subjectId);
+            let result = await this.deleteStudentMeta(studentId);
+            if (result instanceof Error) {
+                return result;
+            }
+
+            result = await this.addSubjectMeta(studentId, subjectId);
             if (result instanceof Error) {
                 return result;
             }
@@ -223,11 +214,12 @@ export class StudentServices {
         let result: any;
         if (searchString) {
             result = await this.context.query(
-                `SELECT * FROM students
+                `SELECT * FROM student
                 WHERE first_name LIKE :searchString
                 OR last_name LIKE :searchString
                 OR registration LIKE :searchString
-                ORDER BY id  DESC LIMIT :itemsPerPage OFFSET :offset
+                OR grade LIKE :searchString
+                ORDER BY  timestamp DESC LIMIT :itemsPerPage OFFSET :offset
                 `,
                 {
                     replacements: {
@@ -273,4 +265,3 @@ export class StudentServices {
         return rowDelete;
     }
 }
-
