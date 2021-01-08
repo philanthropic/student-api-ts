@@ -214,7 +214,7 @@ export class StudentServices {
         let result: any;
         if (searchString) {
             result = await this.context.query(
-                `SELECT * FROM student
+                `SELECT * FROM students
                 WHERE first_name LIKE :searchString
                 OR last_name LIKE :searchString
                 OR registration LIKE :searchString
