@@ -26,6 +26,10 @@ export class StudentController {
 
         const StudentService = await this.getStudentService();
         const studentObject = await StudentService.getStudentById(studentId);
+        
+        if (studentObject instanceof Error){
+            return res.status(400).json({message: studentObject.message})
+        }
 
         return res.status(200).json(studentObject);
     }
