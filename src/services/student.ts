@@ -217,7 +217,7 @@ export class StudentServices {
      * @param {string} searchString
      */
     async listStudents(currentPageNumber: number, searchString: string) {
-        const itemsPerPage: number = 2;
+        const itemsPerPage: number = 10;
         const offset: number = (currentPageNumber - 1) * itemsPerPage;
         let result: any;
         if (searchString) {
@@ -238,24 +238,48 @@ export class StudentServices {
                 }
             );
         } else {
-            result = this.context
-                .query(
-                    "SELECT * FROM students ORDER BY id DESC LIMIT :itemsPerPage OFFSET :offset",
-                    {
-                        replacements: {
-                            itemsPerPage: itemsPerPage,
-                            offset: offset,
-                        },
-                        type: this.context.QueryTypes.SELECT,
-                    }
-                )
-                .then((result: any) => {
-                    return result;
-                })
-                .catch((error: Error) => {
-                    return error;
-                });
+            //SELECT * FROM list_students(1,4)
+            var studentDetails = await this.context.query(
+                "SELECT * FROM list_students(:itemsPerPage, :offset)",
+                {
+                    replacements: {
+                        itemsPerPage: itemsPerPage,
+                        offset: offset,
+                    },
+                    type: this.context.QueryTypes.SELECT,
+                }
+            );
+            // When there is no data returned.
+            if (studentDetails.length < 1) {
+                return new Error("Invalid student Id");
+            }
+           // console.log("yo",studentDetails);
+
+            // Select statement with many to manu relation returns,
+            // multple rows of result where student detail will be same in all rows,
+            // but only subject and teacher will be different.
+            
+            //let result = []
+
+            //console.log(studentDetails);
+            for (let item of studentDetails) {
+                let student = {
+                    id:  item.id,
+                    fullname: item.fullname,
+                    grade: item.grade,
+                    registraion: item.registraion,
+                    subjects: [],
+                };
+                let subject = {
+                    subject: item.subject,
+                    teacher: item.teacher,
+                };
+                student.subjects.push(subject);
+                result.push(student)
+            }   //for loop ends here
+
         }
+
         return result;
     }
 

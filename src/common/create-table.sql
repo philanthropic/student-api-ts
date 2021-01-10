@@ -150,3 +150,41 @@ AS $$
                students.id = _id;
     END;
 $$ LANGUAGE plpgsql;
+
+--list
+CREATE OR REPLACE FUNCTION list_students(IN _itemsperpage INT, IN _offset INT)
+  RETURNS TABLE(
+     id INT,
+     fullname text,
+     grade INT,
+     registration character varying,
+     subject character varying,
+     teacher text
+  )
+AS $$
+#variable_conflict use_column
+    BEGIN
+        RETURN QUERY
+            SELECT
+               students.id,
+               CONCAT(students.first_name, ' ', students.last_name) as fullname,
+               students.grade,
+               students.registration,
+               subjects.name,
+               CONCAT(teachers.first_name, ' ', teachers.last_name) as teacher
+            FROM
+               students
+               JOIN
+                  student_meta as meta
+                  ON meta.student_id = students.id
+               JOIN
+                  subjects
+                  ON subjects.id = meta.subject_id
+               JOIN
+                  teachers
+                  ON teachers.id = subjects.teacher_id
+            ORDER BY id DESC LIMIT _itemsperpage OFFSET _offset;
+               
+    END;
+$$ LANGUAGE plpgsql;
+
