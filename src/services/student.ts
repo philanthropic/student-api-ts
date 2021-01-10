@@ -10,6 +10,7 @@ export class StudentServices {
         this.model = StudentModel.Student(dbconnection);
     }
 
+
     /**
      * Get Student By Id.
      *
@@ -17,32 +18,39 @@ export class StudentServices {
      */
     async getStudentById(studentId: number) {
         // Procedure "student_details_by_id" call will return,
-        // an array of object i.e. [ {id: 8, fullname: 'John Doe', grade: 10, registration: 'X1C'} ]
-        var student = await this.context.query(
+        // an array of object i.e. [ {id: 8, fullname: 'John Doe', grade: 10,
+        // registration: 'X1C'} ]
+        var studentDetails = await this.context.query(
             "SELECT * FROM student_details_by_id(?)",
             {
                 replacements: [studentId],
                 type: this.context.QueryTypes.SELECT,
             }
         );
-        student = student[0] || {};
+        
+        // When there is no data returned.
+        if (studentDetails.length < 1) {
+            return new Error("Invalid student Id");
+        }
 
-        // Procedure call subjects_by_student_id which 
-        //  returns array of objects
-        // [ 
-        //    { subject: 'Maths', teacher: 'Rabindra Rai' },
-        //    { subject: 'Science', teacher: 'Rabindra Rai' }
-        // ]
-        var subjects = await this.context.query(
-            "SELECT * FROM subjects_by_student_id(?)",
-            {
-                replacements: [studentId],
-                type: this.context.QueryTypes.SELECT,
-            }
-        );
+        // Select statement with many to manu relation returns,
+        // multple rows of result where student detail will be same in all rows,
+        // but only subject and teacher will be different.
+        let student = {
+            id: studentDetails[0].id,
+            fullname: studentDetails[0].fullname,
+            grade: studentDetails[0].grade,
+            registraion: studentDetails[0].registraion,
+            subjects: [],
+        };
 
-        // adding new entity "subjects" which is array of object into student object.
-        student.subjects = subjects;
+        for (let item of studentDetails) {
+            let subject = {
+                subject: item.subject,
+                teacher: item.teacher,
+            };
+            student.subjects.push(subject);
+        }
 
         return student;
     }
