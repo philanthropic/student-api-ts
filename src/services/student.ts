@@ -80,6 +80,8 @@ export class StudentServices {
             last_name: studentObj.last_name,
             grade: studentObj.grade,
             registration: studentObj.registration,
+            username: studentObj.username,
+            password: studentObj.password
         });
 
         // creating new subject services instances
@@ -207,7 +209,7 @@ export class StudentServices {
         return result;
     }
 
-    /**
+      /**
      *  List students
      *   i. Pagination
      *   ii. Search student when querystring s is provided
@@ -217,7 +219,7 @@ export class StudentServices {
      * @param {string} searchString
      */
     async listStudents(currentPageNumber: number, searchString: string) {
-        const itemsPerPage: number = 2;
+        const itemsPerPage: number = 10;
         const offset: number = (currentPageNumber - 1) * itemsPerPage;
         let result: any;
         if (searchString) {
@@ -238,24 +240,61 @@ export class StudentServices {
                 }
             );
         } else {
-            result = this.context
-                .query(
-                    "SELECT * FROM students ORDER BY id DESC LIMIT :itemsPerPage OFFSET :offset",
-                    {
-                        replacements: {
-                            itemsPerPage: itemsPerPage,
-                            offset: offset,
-                        },
-                        type: this.context.QueryTypes.SELECT,
-                    }
-                )
-                .then((result: any) => {
-                    return result;
-                })
-                .catch((error: Error) => {
-                    return error;
+            let studentDetails = await this.context.query(
+                "SELECT * FROM list_students(:itemsPerPage, :offset)",
+                {
+                    replacements: {
+                        itemsPerPage: itemsPerPage,
+                        offset: offset,
+                    },
+                    type: this.context.QueryTypes.SELECT,
+                }
+            );
+
+            // When there is no data returned.
+            if (studentDetails.length < 1) {
+                return new Error("Invalid student Id");
+            }
+
+            let studentList = [];
+            for (let item of studentDetails) {
+                // search in "studentList",
+                // if current item object in the loop already exists
+                let student = studentList.find(
+                    (studentObject) => studentObject.id === item.id
+                );
+
+                // if student already exists
+                // no need to create student object.
+                if (student) {
+                    let index = studentList.indexOf(student);
+                    studentList[index].subjects.push({
+                        subject: item.subject,
+                        teacher: item.teacher,
+                    });
+                    continue;
+                }
+
+                student = {
+                    id: item.id,
+                    fullname: item.fullname,
+                    grade: item.grade,
+                    registraion: item.registraion,
+                    subjects: [],
+                };
+
+                student.subjects.push({
+                    subject: item.subject,
+                    teacher: item.teacher,
                 });
+
+                studentList.push(student);
+            } //for loop ends here
+
+            // setting result as studentList
+            result = studentList;
         }
+
         return result;
     }
 
