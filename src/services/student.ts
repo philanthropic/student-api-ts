@@ -207,7 +207,7 @@ export class StudentServices {
         return result;
     }
 
-    /**
+      /**
      *  List students
      *   i. Pagination
      *   ii. Search student when querystring s is provided
@@ -238,8 +238,7 @@ export class StudentServices {
                 }
             );
         } else {
-            //SELECT * FROM list_students(1,4)
-            var studentDetails = await this.context.query(
+            let studentDetails = await this.context.query(
                 "SELECT * FROM list_students(:itemsPerPage, :offset)",
                 {
                     replacements: {
@@ -249,35 +248,49 @@ export class StudentServices {
                     type: this.context.QueryTypes.SELECT,
                 }
             );
+
             // When there is no data returned.
             if (studentDetails.length < 1) {
                 return new Error("Invalid student Id");
             }
-           // console.log("yo",studentDetails);
 
-            // Select statement with many to manu relation returns,
-            // multple rows of result where student detail will be same in all rows,
-            // but only subject and teacher will be different.
-            
-            //let result = []
-
-            //console.log(studentDetails);
+            let studentList = [];
             for (let item of studentDetails) {
-                let student = {
-                    id:  item.id,
+                // search in "studentList",
+                // if current item object in the loop already exists
+                let student = studentList.find(
+                    (studentObject) => studentObject.id === item.id
+                );
+
+                // if student already exists
+                // no need to create student object.
+                if (student) {
+                    let index = studentList.indexOf(student);
+                    studentList[index].subjects.push({
+                        subject: item.subject,
+                        teacher: item.teacher,
+                    });
+                    continue;
+                }
+
+                student = {
+                    id: item.id,
                     fullname: item.fullname,
                     grade: item.grade,
                     registraion: item.registraion,
                     subjects: [],
                 };
-                let subject = {
+
+                student.subjects.push({
                     subject: item.subject,
                     teacher: item.teacher,
-                };
-                student.subjects.push(subject);
-                result.push(student)
-            }   //for loop ends here
+                });
 
+                studentList.push(student);
+            } //for loop ends here
+
+            // setting result as studentList
+            result = studentList;
         }
 
         return result;

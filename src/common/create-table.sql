@@ -188,3 +188,43 @@ AS $$
     END;
 $$ LANGUAGE plpgsql;
 
+--update students
+C
+CREATE OR REPLACE FUNCTION update_students(
+   _id INT,
+   _first_name  character varying,
+   _last_name  character varying,
+   _grade INT,
+   _registration  character varying
+) RETURNS BOOLEAN 
+ AS $$
+BEGIN
+    UPDATE public.students
+       SET first_name =  _first_name,
+               last_name      = _last_name,
+               grade  = _grade,
+               registration  = _registration
+       WHERE  id = _id;
+  RETURN 1;
+END;
+$$ LANGUAGE plpgsql;
+
+--SELECT * from update_students(8, 'Aakar', 'KC',9, 'BBXX');
+
+--create student
+CREATE FUNCTION Insert_student(_sno integer, _id integer, _fn first_name, _ln last_name, _grd grade, _rn registration)
+  RETURNS void AS
+  $BODY$
+      BEGIN
+        INSERT INTO students(sno, id, fn, ln, grd ,rn)
+        VALUES(_sno, _id, _fn, _ln, _grd, _rn);
+        WHERE
+               students.id = _id;
+      END;
+  $BODY$
+  LANGUAGE 'plpgsql' VOLATILE
+  COST 100;
+
+
+select * from Insert_student(1,101,'Ram','Danu',2,'XXR' );
+
