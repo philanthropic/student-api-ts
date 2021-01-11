@@ -11,7 +11,43 @@ export class TeacherServices {
          this.model = TeacherModel.Teachers(dbconnection);
          this.context = dbconnection;
      }
- 
+     //username = gopalkc21@gmail.com, password = xyz
+     async authenticate(username: string, password: string){
+         var validEmail = await this.isValidEmail(username)
+         if (!validEmail){
+             return new Error('Invalid email!')
+         }
+
+         let storedPassword = await this.context.query(
+            "SELECT password FROM teachers WHERE username= ?  LIMIT 1",
+            {
+                replacements: [username],
+                type: this.context.QueryTypes.SELECT,
+            }
+        )
+        
+        //log(storedPassword);
+
+        if (storedPassword instanceof Error) {
+            return new Error(storedPassword.message)
+        }
+
+        storedPassword = storedPassword[0].password
+
+        //console.log(storedPassword);
+
+        //if 'storedPassword' is returned null, then username doesnt exist.
+        if (!storedPassword ) {
+            return new Error('Invalid username')
+        }
+
+        if (password !== storedPassword) {
+            return new Error('Invalid password!')
+        }
+    
+        return storedPassword
+     }
+
      async getTeacherById(teacherId: number) {
          var teacher = await this.model.findOne({ where: { id: teacherId } });
          return teacher;
@@ -78,4 +114,19 @@ export class TeacherServices {
          }
          return rowDelete;
      }
+
+     async isValidEmail(email: string) {
+        const result = await this.context.query(
+            "SELECT CAST( ? AS email)",
+            {
+                replacements: [email],
+                type: this.context.QueryTypes.SELECT,
+            }      
+        ).then(success=> success).catch(error=>error)
+        
+        if (result instanceof Error) {
+            return false
+        }
+        return true
+    }
 }

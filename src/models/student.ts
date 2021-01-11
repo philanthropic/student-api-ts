@@ -21,6 +21,10 @@ const StudentModel = {
                 },
                 registration: {type: Sequelize.DataTypes.STRING,
                 },
+                username:  {type: Sequelize.DataTypes.STRING,
+                },
+                password: {type: Sequelize.DataTypes.STRING,
+                },
             },
             {
                 //freezeTableName: true,

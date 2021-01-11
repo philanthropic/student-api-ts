@@ -80,6 +80,8 @@ export class StudentServices {
             last_name: studentObj.last_name,
             grade: studentObj.grade,
             registration: studentObj.registration,
+            username: studentObj.username,
+            password: studentObj.password
         });
 
         // creating new subject services instances

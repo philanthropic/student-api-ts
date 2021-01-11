@@ -1,10 +1,13 @@
 const express = require("express"); // Importing express module
 const app = express(); // Creating express object
+import {BasicAuth} from "./middleware/basicAuth"
 
 const routes = require("./routes");
-
 const slash = require("express-slash");
 const bodyParser = require("body-parser");
+
+//user-auth
+app.use(new BasicAuth().authenticate);
 
 // Parse request body
 app.use(bodyParser.text());

@@ -6,7 +6,9 @@ CREATE TABLE IF NOT EXISTS public.teachers
 (
     id SERIAL PRIMARY KEY,
     first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL
+    last_name VARCHAR(100) NOT NULL,
+    username VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL
 );
 
 -- Subjects table.
@@ -29,7 +31,8 @@ CREATE TABLE IF NOT EXISTS public.students
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     grade integer NOT NULL,
-    registration VARCHAR(100) NOT NULL
+    registration VARCHAR(100) NOT NULL,
+    
 );
 
 -- Student Meta table
@@ -280,5 +283,12 @@ $$ LANGUAGE plpgsql;
 select * FROM create_studentx('hari', 'lamsal', 10, 'XBC');
 
 
+--login/validation for teachers
+CREATE EXTENSION citext;
+CREATE DOMAIN email AS citext
+  CHECK ( value ~ '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$' );
+
+--SELECT 'foobar@bar.com'::email;
+--SELECT CAST('foobar@bar.com' AS email);
 
 
