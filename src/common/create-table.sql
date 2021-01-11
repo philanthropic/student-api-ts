@@ -70,61 +70,101 @@ CREATE TABLE IF NOT EXISTS public.student_meta
 
 --
 -- Procedure to return student table columens
-CREATE OR REPLACE FUNCTION student_details_by_id(IN _id INT)
-  RETURNS TABLE(
-     id INT,
-     fullname text,
-     grade INT,
-     registration character varying
-  )
-AS $$
-#variable_conflict use_column
-    BEGIN
-        RETURN QUERY
-            SELECT
-               id,
-               CONCAT(first_name, ' ', last_name) as fullname,
-               grade,
-               registration
-            FROM students
-            WHERE id = _id;
-    END;
-$$ LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION student_details_by_id(IN _id INT)
+--   RETURNS TABLE(
+--      id INT,
+--      fullname text,
+--      grade INT,
+--      registration character varying
+--   )
+-- AS $$
+-- #variable_conflict use_column
+--     BEGIN
+--         RETURN QUERY
+--             SELECT
+--                id,
+--                CONCAT(first_name, ' ', last_name) as fullname,
+--                grade,
+--                registration
+--             FROM students
+--             WHERE id = _id;
+--     END;
+-- $$ LANGUAGE plpgsql;
 
---
--- procedure to return all subjects read by a student.
---
-CREATE OR REPLACE FUNCTION subjects_by_student_id( IN _student_id INT )
-  RETURNS TABLE(
-     subject character varying,
-     teacher text
-  )
-AS $$
-#variable_conflict use_column
-BEGIN
-    RETURN QUERY
-        SELECT subjects.name,
-               CONCAT(teachers.first_name, ' ', teachers.last_name) as teacher
-        FROM subjects
-        JOIN teachers
-            ON teachers.id = subjects.teacher_id
-        JOIN student_meta
-            ON student_meta.subject_id = subjects.id
-        WHERE student_meta.student_id = _student_id;
-END;
-$$ LANGUAGE plpgsql;
+-- --
+-- -- procedure to return all subjects read by a student.
+-- --
+-- CREATE OR REPLACE FUNCTION subjects_by_student_id( IN _student_id INT )
+--   RETURNS TABLE(
+--      subject character varying,
+--      teacher text
+--   )
+-- AS $$
+-- #variable_conflict use_column
+-- BEGIN
+--     RETURN QUERY
+--         SELECT subjects.name,
+--                CONCAT(teachers.first_name, ' ', teachers.last_name) as teacher
+--         FROM subjects
+--         JOIN teachers
+--             ON teachers.id = subjects.teacher_id
+--         JOIN student_meta
+--             ON student_meta.subject_id = subjects.id
+--         WHERE student_meta.student_id = _student_id;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
--- Procedure to return student table columens
-CREATE OR REPLACE FUNCTION student_details_by_id(IN _id INT)
-  RETURNS TABLE(
-     id INT,
-     fullname text,
-     grade INT,
-     registration character varying,
-     subject character varying,
-     teacher text
-  )
-AS $$
+-- -- Procedure to return student table columens
+-- CREATE OR REPLACE FUNCTION student_details_by_id(IN _id INT)
+--   RETURNS TABLE(
+--      id INT,
+--      fullname text,
+--      grade INT,
+--      registration character varying,
+--      subject character varying,
+--      teacher text
+--   )
+-- AS $$
+-- #variable_conflict use_column
+--     BEGIN
+--         RETURN QUERY
+--             SELECT
+--                students.id,
+--                CONCAT(students.first_name, ' ', students.last_name) as fullname,
+--                students.grade,
+--                students.registration,
+--                subjects.name,
+--                CONCAT(teachers.first_name, ' ', teachers.last_name) as teacher
+--             FROM
+--                students
+--                JOIN
+--                   student_meta as meta
+--                   ON meta.student_id = students.id
+--                JOIN
+--                   subjects
+--                   ON subjects.id = meta.subject_id
+--                JOIN
+--                   teachers
+--                   ON teachers.id = subjects.teacher_id
+--             WHERE
+--                students.id = _id;
+--     END;
+-- $$ LANGUAGE plpgsql;
+
+--detail
+-- FUNCTION: public.student_details_by_id(integer)
+
+-- DROP FUNCTION public.student_details_by_id(integer);
+
+CREATE OR REPLACE FUNCTION public.student_details_by_id(
+	_id integer)
+    RETURNS TABLE(id integer, fullname text, grade integer, registration character varying, subject character varying, teacher text) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
 #variable_conflict use_column
     BEGIN
         RETURN QUERY
@@ -149,7 +189,12 @@ AS $$
             WHERE
                students.id = _id;
     END;
-$$ LANGUAGE plpgsql;
+$BODY$;
+
+ALTER FUNCTION public.student_details_by_id(integer)
+    OWNER TO postgres;
+
+
 
 --list
 CREATE OR REPLACE FUNCTION list_students(IN _itemsperpage INT, IN _offset INT)
