@@ -10,7 +10,6 @@ export class StudentServices {
         this.model = StudentModel.Student(dbconnection);
     }
 
-
     /**
      * Get Student By Id.
      *
@@ -27,7 +26,7 @@ export class StudentServices {
                 type: this.context.QueryTypes.SELECT,
             }
         );
-        
+
         // When there is no data returned.
         if (studentDetails.length < 1) {
             return new Error("Invalid student Id");
@@ -125,7 +124,7 @@ export class StudentServices {
 
         // new instance subject service
         const SubjectService = new SubjectServices(this.context);
-        
+
         result = await this.deleteStudentMeta(studentId);
         if (result instanceof Error) {
             return result;
@@ -163,10 +162,10 @@ export class StudentServices {
      */
     async addSubjectMeta(studentId: number, subjectId: number) {
         const sql = `
-            INSERT INTO student_meta
-                (student_id, subject_id)
-            VALUES
-            (:student_id, :subject_id)`;
+        INSERT INTO student_meta
+        (student_id, subject_id)
+        VALUES
+        (:student_id, :subject_id)`;
 
         let result = await this.context
             .query(sql, {

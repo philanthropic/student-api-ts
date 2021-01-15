@@ -12,6 +12,8 @@ const TeacherModel = {
                 },
                 first_name: Sequelize.DataTypes.STRING,
                 last_name: Sequelize.DataTypes.STRING,
+                username: Sequelize.DataTypes.STRING,
+                password:  Sequelize.DataTypes.STRING,
             },
             {
                 tableName: "teachers",

@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS public.students
     last_name VARCHAR(100) NOT NULL,
     grade integer NOT NULL,
     registration VARCHAR(100) NOT NULL,
-    
+    username VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL
 );
 
 -- Student Meta table
@@ -180,13 +181,13 @@ AS $BODY$
                CONCAT(teachers.first_name, ' ', teachers.last_name) as teacher
             FROM
                students
-               JOIN
+               LEFT JOIN
                   student_meta as meta
                   ON meta.student_id = students.id
-               JOIN
+               LEFT JOIN
                   subjects
                   ON subjects.id = meta.subject_id
-               JOIN
+               LEFT JOIN
                   teachers
                   ON teachers.id = subjects.teacher_id
             WHERE
@@ -222,13 +223,13 @@ AS $$
                CONCAT(teachers.first_name, ' ', teachers.last_name) as teacher
             FROM
                students
-               JOIN
+              LEFT JOIN
                   student_meta as meta
                   ON meta.student_id = students.id
-               JOIN
+              LEFT JOIN
                   subjects
                   ON subjects.id = meta.subject_id
-               JOIN
+              LEFT  JOIN
                   teachers
                   ON teachers.id = subjects.teacher_id
             ORDER BY id DESC LIMIT _itemsperpage OFFSET _offset;
@@ -237,7 +238,7 @@ AS $$
 $$ LANGUAGE plpgsql;
 
 --update students
-C
+
 CREATE OR REPLACE FUNCTION update_students(
    _id INT,
    _first_name  character varying,

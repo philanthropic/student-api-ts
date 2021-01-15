@@ -18,7 +18,15 @@ export class StudentController {
      * @param {any} res
      */
     async studentDetails(req: any, res: any) {
-        const studentId: number = req.params.studentId;
+        const studentId: number = parseInt(req.params.studentId);
+
+        // if authuser is type student
+        // and trying to view other sudents details
+        if (req.authUser.type === "student" && req.authUser.id !== studentId) {
+            return res
+                .status(400)
+                .json({ message: "Sorry! students are not allowed to view this resource." });
+        }
 
         if (!studentId) {
             return res.status(400).json({ message: "Student Id not provided" });
@@ -26,9 +34,9 @@ export class StudentController {
 
         const StudentService = await this.getStudentService();
         const studentObject = await StudentService.getStudentById(studentId);
-        
-        if (studentObject instanceof Error){
-            return res.status(400).json({message: studentObject.message})
+
+        if (studentObject instanceof Error) {
+            return res.status(400).json({ message: studentObject.message });
         }
 
         return res.status(200).json(studentObject);
@@ -41,7 +49,15 @@ export class StudentController {
      * @param {any} res
      */
     async addNewStudent(req: any, res: any) {
-        if (!req.body.first_name ) {
+        // if authuser is type student
+        // and trying to view other sudents details
+        if (req.authUser.type === "student") {
+            return res
+                .status(400)
+                .json({ message: "Sorry! students cannot add other students." });
+        }
+
+        if (!req.body.first_name) {
             return res
                 .status(400)
                 .json({ message: "Student first name cannot be empty" });
@@ -93,12 +109,18 @@ export class StudentController {
      */
     async updateStudent(req: any, res: any) {
         const studentId: number = req.params.studentId;
+
+        // if authuser is type student
+        // and trying to view other sudents details
+        if (req.authUser.type === "student" && req.authUser.id !== studentId) {
+            return res
+                .status(400)
+                .json({ message: "Sorry you can not update this resource." });
+        }
+
         const StudentService = await this.getStudentService();
 
-        const isError = await StudentService.updateStudent(
-            studentId,
-            req.body
-        );
+        const isError = await StudentService.updateStudent(studentId, req.body);
 
         if (isError instanceof Error) {
             console.log(isError.message);
@@ -111,6 +133,12 @@ export class StudentController {
     }
 
     async deleteStudent(req: any, res: any) {
+        if (req.authUser.type === "student") {
+            return res
+                .status(400)
+                .json({ message: "Sorry you can not update this resource." });
+        }
+
         const studentId = req.params.studentId;
         if (!studentId) {
             return res.status(400).json({ message: "studentId not provided." });
@@ -139,10 +167,15 @@ export class StudentController {
      * @param {string} searchString
      */
     async studentList(req: any, res: any) {
+        if (req.authUser.type === "student") {
+            return res
+                .status(400)
+                .json({ message: "Sorry you can not list all students." });
+        }
+
         const currentPage: number = req.params.pageId || 1;
         const searchString: string = req.query.search;
 
-    
         // Create a new StudentService
         const StudentService = await this.getStudentService();
 

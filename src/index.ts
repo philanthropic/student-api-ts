@@ -1,6 +1,6 @@
 const express = require("express"); // Importing express module
 const app = express(); // Creating express object
-import {BasicAuth} from "./middleware/basicAuth"
+import { BasicAuth } from "./middleware/basicAuth";
 
 const routes = require("./routes");
 const slash = require("express-slash");
@@ -14,7 +14,7 @@ app.use(bodyParser.text());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.enable("strict routing");   
+app.enable("strict routing");
 app.enable("case sensitive routing");
 
 const serverSetup = async () => {
